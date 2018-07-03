@@ -140,7 +140,9 @@ class PongView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
                     circleY = CIRCLE_RAD
                     dY *= -1
                 }
-                invalidate()
+
+                postInvalidate()
+
                 sleep(10)
             }
         }
