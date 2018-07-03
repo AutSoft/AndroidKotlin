@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ResourceQualifierDemo</string>
+    <string name="welcome_text">Hello World!</string>
+    <string name="welcome_main">Welcome in the app</string>
+</resources>

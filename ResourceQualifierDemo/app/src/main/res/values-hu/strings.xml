@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">ResourceQualifierDemo</string>
+    <string name="welcome_text">Hello Világ!</string>
+    <string name="welcome_main">Üdv az appban</string>
+</resources>
