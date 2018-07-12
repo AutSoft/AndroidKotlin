@@ -2,19 +2,27 @@ package hu.aut.android.kotlinshoppinglist.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.TextView
+import hu.aut.android.kotlinshoppinglist.MainActivity
 import hu.aut.android.kotlinshoppinglist.R
 import hu.aut.android.kotlinshoppinglist.adapter.ShoppingAdapter.ViewHolder
 import hu.aut.android.kotlinshoppinglist.data.ShoppingItem
+import hu.aut.android.kotlinshoppinglist.touch.ShoppingTouchHelperAdapter
 import kotlinx.android.synthetic.main.row_item.view.*
+import java.util.*
 
-class ShoppingAdapter : RecyclerView.Adapter<ViewHolder>() {
-    private val items = mutableListOf<ShoppingItem>(
-            ShoppingItem("milk", 200, false),
-            ShoppingItem("battery", 500, false),
-            ShoppingItem("pizza", 300, true)
-    )
+class ShoppingAdapter : RecyclerView.Adapter<ViewHolder>, ShoppingTouchHelperAdapter {
+
+    private val items = mutableListOf<ShoppingItem>()
+
+    constructor(items: List<ShoppingItem>) : super() {
+        this.items.addAll(items)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(
@@ -31,11 +39,56 @@ class ShoppingAdapter : RecyclerView.Adapter<ViewHolder>() {
         holder.tvName.text = items[position].name
         holder.tvPrice.text = items[position].price.toString()
         holder.cbBought.isChecked = items[position].bought
+
+        holder.btnDelete.setOnClickListener{
+            deleteItem(holder.adapterPosition)
+        }
+
+        holder.btnEdit.setOnClickListener{
+            (holder.itemView.context as MainActivity).showEditItemDialog(
+                    items[holder.adapterPosition])
+        }
+    }
+
+    fun addItem(item: ShoppingItem) {
+        items.add(item)
+        notifyItemInserted(items.lastIndex)
+    }
+
+    fun deleteItem(position: Int) {
+        items.removeAt(position)
+        notifyItemRemoved(position)
+    }
+
+    fun updateItem(item: ShoppingItem) {
+        val idx = items.indexOf(item)
+        items[idx] = item
+        notifyItemChanged(idx)
+    }
+
+    override fun onItemDismissed(position: Int) {
+        deleteItem(position)
+    }
+
+    override fun onItemMoved(fromPosition: Int, toPosition: Int) {
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(items, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(items, i, i - 1)
+            }
+        }
+
+        notifyItemMoved(fromPosition, toPosition)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val tvName = itemView.tvName
-        val tvPrice = itemView.tvPrice
-        val cbBought = itemView.cbBought
+        val tvName: TextView = itemView.tvName
+        val tvPrice: TextView  = itemView.tvPrice
+        val cbBought: CheckBox  = itemView.cbBought
+        val btnDelete: Button = itemView.btnDelete
+        val btnEdit: Button = itemView.btnEdit
     }
 }
