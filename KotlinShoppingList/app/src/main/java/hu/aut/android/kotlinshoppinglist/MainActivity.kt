@@ -23,6 +23,7 @@ import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 
 class MainActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHandler {
     companion object {
+        val KEY_FIRST = "KEY_FIRST"
         val KEY_ITEM_TO_EDIT = "KEY_ITEM_TO_EDIT"
     }
 
@@ -38,14 +39,41 @@ class MainActivity : AppCompatActivity(), ShoppingItemDialog.ShoppingItemHandler
         }
 
         initRecyclerView()
+
+        if (isFirstRun()) {
+            MaterialTapTargetPrompt.Builder(this@MainActivity)
+                    .setTarget(findViewById<View>(R.id.fab))
+                    .setPrimaryText("New Shopping Item")
+                    .setSecondaryText("Tap here to create new shopping item")
+                    .show()
+        }
+
+
+        saveThatItWasStarted()
     }
+
+    private fun isFirstRun(): Boolean {
+        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+                KEY_FIRST, true
+        )
+    }
+
+    private fun saveThatItWasStarted() {
+        val sp = PreferenceManager.getDefaultSharedPreferences(this)
+        sp.edit()
+                .putBoolean(KEY_FIRST, false)
+                .apply()
+    }
+
+
+
 
     private fun initRecyclerView() {
         val dbThread = Thread {
             val items = AppDatabase.getInstance(this).shoppingItemDao().findAllItems()
 
             runOnUiThread{
-                adapter = ShoppingAdapter(items)
+                adapter = ShoppingAdapter(this, items)
                 recyclerShopping.adapter = adapter
 
                 val callback = ShoppingTouchHelperCallback(adapter)

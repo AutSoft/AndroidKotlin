@@ -1,5 +1,6 @@
 package hu.aut.android.kotlinshoppinglist.adapter
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.TextureView
@@ -11,6 +12,7 @@ import android.widget.TextView
 import hu.aut.android.kotlinshoppinglist.MainActivity
 import hu.aut.android.kotlinshoppinglist.R
 import hu.aut.android.kotlinshoppinglist.adapter.ShoppingAdapter.ViewHolder
+import hu.aut.android.kotlinshoppinglist.data.AppDatabase
 import hu.aut.android.kotlinshoppinglist.data.ShoppingItem
 import hu.aut.android.kotlinshoppinglist.touch.ShoppingTouchHelperAdapter
 import kotlinx.android.synthetic.main.row_item.view.*
@@ -19,8 +21,10 @@ import java.util.*
 class ShoppingAdapter : RecyclerView.Adapter<ViewHolder>, ShoppingTouchHelperAdapter {
 
     private val items = mutableListOf<ShoppingItem>()
+    private val context: Context
 
-    constructor(items: List<ShoppingItem>) : super() {
+    constructor(context: Context, items: List<ShoppingItem>) : super() {
+        this.context = context
         this.items.addAll(items)
     }
 
@@ -40,13 +44,21 @@ class ShoppingAdapter : RecyclerView.Adapter<ViewHolder>, ShoppingTouchHelperAda
         holder.tvPrice.text = items[position].price.toString()
         holder.cbBought.isChecked = items[position].bought
 
-        holder.btnDelete.setOnClickListener{
+        holder.btnDelete.setOnClickListener {
             deleteItem(holder.adapterPosition)
         }
 
-        holder.btnEdit.setOnClickListener{
+        holder.btnEdit.setOnClickListener {
             (holder.itemView.context as MainActivity).showEditItemDialog(
                     items[holder.adapterPosition])
+        }
+
+        holder.cbBought.setOnClickListener {
+            items[position].bought = holder.cbBought.isChecked
+            val dbThread = Thread {
+                AppDatabase.getInstance(context).shoppingItemDao().updateItem(items[position])
+            }
+            dbThread.start()
         }
     }
 
@@ -56,8 +68,15 @@ class ShoppingAdapter : RecyclerView.Adapter<ViewHolder>, ShoppingTouchHelperAda
     }
 
     fun deleteItem(position: Int) {
-        items.removeAt(position)
-        notifyItemRemoved(position)
+        val dbThread = Thread {
+            AppDatabase.getInstance(context).shoppingItemDao().deleteItem(
+                    items[position])
+            (context as MainActivity).runOnUiThread{
+                items.removeAt(position)
+                notifyItemRemoved(position)
+            }
+        }
+        dbThread.start()
     }
 
     fun updateItem(item: ShoppingItem) {
@@ -71,23 +90,15 @@ class ShoppingAdapter : RecyclerView.Adapter<ViewHolder>, ShoppingTouchHelperAda
     }
 
     override fun onItemMoved(fromPosition: Int, toPosition: Int) {
-        if (fromPosition < toPosition) {
-            for (i in fromPosition until toPosition) {
-                Collections.swap(items, i, i + 1)
-            }
-        } else {
-            for (i in fromPosition downTo toPosition + 1) {
-                Collections.swap(items, i, i - 1)
-            }
-        }
+        Collections.swap(items, fromPosition, toPosition)
 
         notifyItemMoved(fromPosition, toPosition)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvName: TextView = itemView.tvName
-        val tvPrice: TextView  = itemView.tvPrice
-        val cbBought: CheckBox  = itemView.cbBought
+        val tvPrice: TextView = itemView.tvPrice
+        val cbBought: CheckBox = itemView.cbBought
         val btnDelete: Button = itemView.btnDelete
         val btnEdit: Button = itemView.btnEdit
     }

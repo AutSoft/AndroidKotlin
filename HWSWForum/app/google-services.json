@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "298917608495",
+    "firebase_url": "https://hwswforum-e1bc3.firebaseio.com",
+    "project_id": "hwswforum-e1bc3",
+    "storage_bucket": "hwswforum-e1bc3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:298917608495:android:b50e6b1607e63688",
+        "android_client_info": {
+          "package_name": "hu.aut.android.hwswforum"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "298917608495-5ojvodhgmp062v659jn0jh393o83hmct.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "hu.aut.android.hwswforum",
+            "certificate_hash": "679d077dd087334a5834d3d30791147420aace41"
+          }
+        },
+        {
+          "client_id": "298917608495-h7jeh8tv90ta7lt7uohsscog7ipkoikg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAgL6csywI57HgJKIaObKMMMn1brpt1Yk0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "298917608495-h7jeh8tv90ta7lt7uohsscog7ipkoikg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
